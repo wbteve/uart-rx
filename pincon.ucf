@@ -1,0 +1,6 @@
+NET  clk      LOC="AG18"; // 27MHz clk
+NET  rst            LOC="AJ6"; // central push button
+NET  led[0]           LOC="E8"; // led_centre
+NET  led[1]           LOC="AG23";  # led_east
+NET  led[2]          LOC="AF13"; # led_north
+NET  rxd               LOC="H33"; // HDR1_2
