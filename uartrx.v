@@ -19,11 +19,10 @@
 */
 module uartrx #(parameter div=234)(
     input clk,
-	 input rst,
-	 input rxd,
+    input rst,
+    input rxd,
     output reg [7:0] data,
-    output req,
-	 input ack
+    output reg req
     );
 	 
 	reg startbit;
@@ -34,11 +33,19 @@ module uartrx #(parameter div=234)(
 	wire shift;
 	
 	////////////////////////////////got data////////////////////////////////////////////////////
-	assign req = (nextstate == 0 & state == 10);
+	assign req1 = (nextstate == 0 & state == 10);
 	always @(posedge clk or posedge rst) begin
 		if(rst) data <= 0;
-		else if(req) data <= tempdata;
+		else if(req1) data <= tempdata;
 	end
+
+	//req is one-cycle delayed -- to match the cycle in which 'data' is driven-out
+        always @(posedge clk or posedge rst) begin
+		if(rst) req <= 0;
+                else req <= req1;
+        end
+
+        
 	
 	///////////////////////////////data shifter////////////////////////////////////////////////
 	always @(posedge clk or posedge rst) begin
@@ -61,18 +68,18 @@ module uartrx #(parameter div=234)(
 	reg [31:0] regcount;
 	always @(posedge clk or posedge rst) begin
 		if(rst) begin
-						startbit <= 0;
-						regcount <= 0;
-				  end
+                        startbit <= 0;
+		        regcount <= 0;
+		end
 		else begin
-					startbit <= 0;
-					if(~uartbit & (state == 0) & (startbit == 0)) begin
-															regcount <= div/2;
-															startbit <= 1;
-														 end
-					else if(regcount == (div-1)) regcount <= 0;
-					else regcount <= regcount + 1;
-			  end
+			startbit <= 0;
+			if(~uartbit & (state == 0) & (startbit == 0)) begin
+		        	regcount <= div/2;
+				startbit <= 1;
+			end
+			else if(regcount == (div-1)) regcount <= 0;
+			else regcount <= regcount + 1;
+		end
 	end
 	assign nextbit = (regcount == 0);
 
@@ -86,8 +93,8 @@ module uartrx #(parameter div=234)(
 		nextstate <= state;
 		case(state)
 			4'h0: begin
-						if(startbit) nextstate <= 1;
-					end
+				if(startbit) nextstate <= 1;
+			      end
 			4'h1: if(nextbit) nextstate <=2;
 			4'h2: if(nextbit) nextstate <=3;
 			4'h3: if(nextbit) nextstate <=4;

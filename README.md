@@ -12,3 +12,8 @@ Demo Application
 - Open a terminal program such as TeraTerm and set the baud rate to 115200
 - Hit 0 and 3 leds should be off
 - Hit 0-7 and observe the 3 leds (central,north and east on the ML506 board)
+
+Acknowledgments
+---------------
+
+- Viveka - for fixing a 1 cycle latency related bug.
